@@ -1,0 +1,553 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AD CH3 - Évolution du modèle de l'atome</title>
+<style>
+  :root{
+    --bleu:#1F4E79;--bleu2:#2E75B6;--bleu3:#D6E4F0;
+    --rouge:#C00000;--vert:#1E6B2E;--orange:#E67E22;--violet:#7D3C98;
+    --turquoise:#148F77;--gris:#F4F4F4;--gris2:#DDDDDD;--noir:#1A1A1A;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{font-family:'Segoe UI',Arial,sans-serif;background:#ECEFF4;color:var(--noir);font-size:15px;}
+  .eleve-header{display:flex;flex-wrap:wrap;align-items:center;gap:10px;background:white;border-bottom:2px solid var(--gris2);padding:10px 20px;}
+  .eleve-header h2{font-size:14px;font-weight:700;color:var(--bleu);margin-right:6px;white-space:nowrap;}
+  .field{display:flex;align-items:center;gap:5px;font-size:13px;}
+  .field label{color:#555;white-space:nowrap;}
+  .field input{border:1px solid var(--gris2);border-radius:4px;padding:3px 7px;font-size:13px;width:130px;}
+  .field input.short{width:60px;}
+  header{background:var(--bleu);color:white;padding:12px 24px;display:flex;align-items:center;gap:14px;box-shadow:0 2px 8px rgba(0,0,0,0.3);}
+  .header-badge{background:var(--rouge);color:white;font-weight:700;font-size:14px;padding:6px 12px;border-radius:6px;white-space:nowrap;}
+  .header-titles h1{font-size:17px;font-weight:700;line-height:1.2;}
+  .header-titles p{font-size:12px;opacity:0.75;margin-top:2px;}
+  .print-bar{display:flex;justify-content:flex-end;align-items:center;gap:8px;margin:10px 20px 4px;}
+  .btn-print{background:var(--bleu);color:white;border:none;border-radius:7px;padding:9px 20px;font-size:14px;font-weight:700;cursor:pointer;}
+  .btn-print:hover{background:var(--bleu2);}
+  .toolbox{margin:0 20px 14px;background:white;border:2px solid var(--bleu2);border-radius:10px;overflow:hidden;}
+  .toolbox-header{background:var(--bleu2);color:white;padding:10px 16px;font-weight:700;font-size:14px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;user-select:none;}
+  .toolbox-header:hover{background:var(--bleu);}
+  .toolbox-body{padding:14px 16px;display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;}
+  .toolbox-body.collapsed{display:none;}
+  .def-card{background:var(--gris);border-left:4px solid var(--bleu2);border-radius:6px;padding:10px 12px;}
+  .def-card h4{color:var(--bleu);font-size:13px;margin-bottom:6px;}
+  .def-card p{font-size:13px;line-height:1.6;text-align:justify;}
+  .def-card .formula{background:white;border:1px solid var(--gris2);border-radius:4px;padding:6px 10px;margin-top:6px;font-size:13px;text-align:center;}
+  .tabs-wrapper{margin:0 20px 20px;}
+  .tabs{display:flex;gap:4px;overflow-x:auto;padding-bottom:2px;}
+  .tab-btn{background:white;border:2px solid var(--gris2);border-bottom:none;border-radius:8px 8px 0 0;padding:8px 14px;font-size:13px;font-weight:600;cursor:pointer;color:#666;white-space:nowrap;transition:all .2s;}
+  .tab-btn:hover{background:var(--bleu3);color:var(--bleu);}
+  .tab-btn.active{background:var(--bleu);color:white;border-color:var(--bleu);}
+  .tab-content{background:white;border:2px solid var(--gris2);border-radius:0 8px 8px 8px;padding:20px;display:none;}
+  .tab-content.active{display:block;}
+  .situation-header{display:flex;align-items:flex-start;gap:14px;margin-bottom:16px;}
+  .situation-num{background:var(--rouge);color:white;font-weight:700;font-size:20px;width:42px;height:42px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+  .situation-header h2{font-size:17px;color:var(--bleu);margin-bottom:4px;}
+  .situation-header p{font-size:13px;color:#555;line-height:1.5;}
+  .canvas-zone{display:flex;gap:16px;align-items:flex-start;flex-wrap:wrap;}
+  canvas{border:2px solid var(--gris2);border-radius:8px;display:block;background:#F8FBFF;}
+  .controls{display:flex;flex-direction:column;gap:8px;min-width:210px;}
+  .ctrl-section{font-size:11px;font-weight:700;color:#888;text-transform:uppercase;letter-spacing:1px;margin-top:4px;}
+  .toggle-group{display:flex;flex-direction:column;gap:5px;}
+  .toggle-btn{border:2px solid;border-radius:6px;padding:7px 10px;font-size:12px;font-weight:700;cursor:pointer;transition:all .15s;background:white;display:flex;align-items:center;gap:5px;width:100%;}
+  .toggle-btn.t-proton{border-color:#C00000;color:#C00000;}
+  .toggle-btn.t-proton.active{background:#C00000;color:white;}
+  .toggle-btn.t-neutron{border-color:#555;color:#555;}
+  .toggle-btn.t-neutron.active{background:#555;color:white;}
+  .toggle-btn.t-electron{border-color:#2E75B6;color:#2E75B6;}
+  .toggle-btn.t-electron.active{background:#2E75B6;color:white;}
+  .info-box{background:var(--bleu3);border:1px solid var(--bleu2);border-radius:6px;padding:8px 10px;font-size:12px;margin-top:4px;line-height:1.6;}
+  .info-box strong{color:var(--bleu);display:block;margin-bottom:3px;}
+  .piege-box{background:#FFF8E1;border:2px solid #F0C040;border-radius:8px;padding:8px 12px;font-size:12px;margin-top:6px;line-height:1.5;}
+  .piege-box strong{color:#8B6000;}
+  .data-box{background:#F0FFF4;border:1px solid #A9DFBF;border-radius:6px;padding:8px 10px;font-size:12px;margin-top:4px;line-height:1.8;}
+  .data-box strong{color:#1E6B2E;display:block;margin-bottom:3px;}
+  .slider-zone{display:flex;flex-direction:column;gap:4px;margin-top:2px;}
+  .slider-zone label{font-size:12px;color:#555;font-weight:600;}
+  .slider-zone input[type=range]{width:100%;cursor:pointer;}
+  .slider-val{font-size:13px;font-weight:700;color:var(--bleu);text-align:center;background:var(--bleu3);border-radius:4px;padding:2px 6px;}
+  .result-box{background:#F0F4FF;border:1px solid var(--bleu2);border-radius:6px;padding:8px 10px;font-size:12px;margin-top:6px;line-height:2;}
+  .result-box strong{color:var(--bleu);display:block;margin-bottom:3px;}
+  .result-row{display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #dde;padding:2px 0;}
+  .result-row:last-child{border-bottom:none;}
+  .result-label{color:#444;}
+  .result-val{font-weight:700;color:var(--bleu);}
+  .atom-select-custom{width:100%;padding:6px 8px;border:2px solid var(--bleu2);border-radius:6px;font-size:13px;font-weight:600;color:var(--bleu);cursor:pointer;background:white;}
+  .questions{margin-top:16px;border-top:2px solid var(--bleu3);padding-top:14px;}
+  .q-title{font-size:12px;font-weight:700;color:var(--bleu);margin-bottom:10px;text-transform:uppercase;letter-spacing:0.5px;}
+  .question{background:var(--gris);border-left:4px solid var(--bleu2);border-radius:0 6px 6px 0;padding:9px 12px;margin-bottom:8px;}
+  .question .code{display:inline-block;color:white;font-size:11px;font-weight:700;padding:2px 6px;border-radius:3px;margin-right:5px;}
+  .code-app{background:#1F4E79;}.code-rea{background:#1E6B2E;}.code-val{background:#7D3C98;}
+  .question p{font-size:13px;line-height:1.5;margin-bottom:6px;}
+  textarea{width:100%;border:1.5px solid var(--gris2);border-radius:4px;padding:6px 8px;font-size:13px;font-family:inherit;resize:vertical;min-height:52px;background:#FAFAFA;}
+  textarea:focus{outline:none;border-color:var(--bleu2);}
+  .nav-bottom{display:flex;justify-content:flex-end;margin-top:14px;gap:8px;}
+  .btn-nav{background:var(--bleu);color:white;border:none;border-radius:6px;padding:7px 16px;font-size:13px;font-weight:600;cursor:pointer;}
+  .btn-nav:hover{background:var(--bleu2);}
+  /* Onglet 5 masse - ligne de calcul */
+  .calc-row{display:flex;align-items:center;gap:8px;margin:4px 0;font-size:13px;}
+  .calc-label{min-width:140px;color:#444;}
+  .calc-input{border:1.5px solid var(--gris2);border-radius:4px;padding:3px 7px;font-size:13px;width:130px;font-family:inherit;}
+  .calc-input:focus{outline:none;border-color:var(--bleu2);}
+  .calc-unit{color:#666;font-size:12px;}
+  .feedback{font-size:12px;font-weight:700;margin-left:6px;}
+  .feedback.ok{color:var(--vert);}
+  .feedback.ko{color:var(--rouge);}
+  /* Onglet 6 - isotopes builder */
+  .iso-builder{display:flex;gap:20px;flex-wrap:wrap;margin-bottom:12px;}
+  .iso-panel{flex:1;min-width:200px;background:var(--gris);border-radius:8px;padding:12px;border:2px solid var(--gris2);}
+  .iso-panel h4{color:var(--bleu);font-size:13px;margin-bottom:8px;font-weight:700;}
+  .iso-verdict{background:#F0F4FF;border:1px solid var(--bleu2);border-radius:6px;padding:10px 14px;font-size:13px;margin-top:8px;min-height:36px;line-height:1.6;}
+  @media print{
+    .frise,.model-box,#score{display:none!important;}
+    .doc-card{display:block!important;page-break-inside:avoid;margin-bottom:6px;}
+    .doc-body img{width:60px;}
+    .match-row{page-break-inside:avoid;}
+    select{border:1px solid #bbb!important;}
+    @page{margin:0.7cm;}
+    body{background:white;font-size:10pt;}
+    .btn,.btn-print,.print-bar,.tab-btn,.btn-nav,.controls,.toolbox{display:none!important;}
+    .tabs{display:none!important;}
+    canvas,.canvas-zone{display:none!important;}
+    .tab-content{display:block!important;border:1px solid #ccc;page-break-inside:unset;margin-bottom:10pt;padding:8px;}
+    .situation-header{margin-bottom:6px;}
+    .question{page-break-inside:avoid;padding:5px 8px;margin-bottom:5px;}
+    .q-title{margin-top:6px;margin-bottom:5px;}
+    textarea{border:1px solid #bbb;min-height:28pt;background:white;}
+    .data-box{display:none!important;}.piege-box{display:none!important;}.info-box{display:none!important;}
+    .result-box{border:1px solid #ccc;}
+    .header-badge{background:#C00000!important;-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+    .eleve-header{margin:0 0 6px 0;padding:8px 12px;}
+    header{padding:8px 14px;}
+    .tabs-wrapper{margin:0;}
+  }
+
+  #tab-1 .controls{flex:1;max-width:320px;}
+  .code-ana{background:#E67E22;}.code-com{background:#148F77;}
+  .frise{display:flex;gap:6px;overflow-x:auto;padding:6px 2px 14px;position:relative;margin-bottom:12px;}
+  .frise::before{content:"";position:absolute;left:10px;right:10px;top:50px;height:4px;background:var(--bleu3);border-radius:2px;z-index:0;}
+  .frise-step{position:relative;z-index:1;flex:1;min-width:92px;background:white;border:2px solid var(--gris2);border-radius:10px;padding:6px 4px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:3px;transition:all .15s;font-family:inherit;}
+  .frise-step img{width:60px;height:66px;object-fit:cover;border-radius:8px;}
+  .frise-step .fdate{font-size:11px;font-weight:700;color:var(--rouge);}
+  .frise-step .fname{font-size:11px;font-weight:600;color:var(--bleu);text-align:center;line-height:1.2;}
+  .frise-step:hover{border-color:var(--bleu2);transform:translateY(-2px);}
+  .frise-step.active{border-color:var(--bleu);background:var(--bleu3);box-shadow:0 2px 6px rgba(31,78,121,.25);}
+  .doc-zone{display:flex;gap:16px;align-items:flex-start;flex-wrap:wrap;}
+  #docs{flex:1;min-width:280px;}
+  .doc-card{display:none;border:1px solid var(--gris2);border-radius:8px;overflow:hidden;}
+  .doc-card.active{display:block;}
+  .doc-band{background:#E7E6E6;color:#333;font-weight:700;font-size:13px;padding:6px 12px;border-bottom:1px solid var(--gris2);}
+  .doc-body{display:flex;gap:12px;padding:12px;align-items:flex-start;}
+  .doc-body img{width:110px;border-radius:8px;flex-shrink:0;}
+  .doc-body p{font-size:13.5px;line-height:1.65;text-align:justify;}
+  .model-box{display:flex;flex-direction:column;align-items:center;gap:6px;}
+  .legend{display:flex;gap:10px;flex-wrap:wrap;font-size:11px;color:#555;justify-content:center;}
+  .legend i{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:4px;vertical-align:middle;}
+  .match{display:flex;flex-direction:column;gap:6px;}
+  .match-row{display:grid;grid-template-columns:1fr 170px 24px;gap:10px;align-items:center;background:var(--gris);border-left:4px solid var(--bleu2);border-radius:0 6px 6px 0;padding:7px 10px;}
+  .match-txt{font-size:13px;line-height:1.45;}
+  @media (max-width:600px){.match-row{grid-template-columns:1fr 24px;}.match-row select{grid-column:1;}.doc-body{flex-direction:column;}canvas{max-width:100%;height:auto;}}
+</style>
+</head>
+<body>
+
+<div class="eleve-header">
+  <h2>CH3 - Noyau de l'atome &nbsp;|&nbsp; 2<sup>nde</sup></h2>
+  <div class="field"><label>Nom :</label><input type="text" placeholder="………………………………"></div>
+  <div class="field"><label>Prénom :</label><input type="text" placeholder="………………………………"></div>
+  <div class="field"><label>Classe :</label><input type="text" placeholder="2nde …" class="short"></div>
+  <div class="field"><label>Date :</label><input type="text" placeholder="…/…/……" class="short"></div>
+</div>
+
+<header>
+  <div class="header-badge">CH3</div>
+  <div class="header-titles">
+    <h1>🕰️ L'évolution du modèle de l'atome</h1>
+    <p>CH3 - Noyau de l'atome - 2nde · Activité documentaire · ≈ 30 min</p>
+  </div>
+</header>
+
+<div class="print-bar">
+  <button class="btn-print" onclick="window.print()">🖨️ Imprimer / Exporter PDF</button>
+  <button class="btn-print" style="background:var(--vert)" onclick="sauvegarder()">💾 Sauvegarder</button>
+  <button class="btn-print" style="background:var(--orange)" onclick="charger()">📂 Charger</button>
+  <span id="save-status" style="font-size:12px;color:#555;align-self:center;"></span>
+</div>
+
+<div class="toolbox">
+  <div class="toolbox-header" onclick="toggleToolbox()">🧰 Boîte à outils - Notions essentielles <span id="toolbox-arrow">▼</span></div>
+  <div class="toolbox-body" id="toolbox-body">
+    <div class="def-card">
+      <h4>📌 Qu'est-ce qu'un modèle ?</h4>
+      <p>Un <b>modèle</b> est une représentation simplifiée de la réalité qui permet d'<b>expliquer</b> des observations. Quand une expérience donne un résultat que le modèle n'explique pas, on le <b>modifie</b> ou on le <b>remplace</b>.</p>
+    </div>
+    <div class="def-card">
+      <h4>📌 Le modèle actuel de l'atome</h4>
+      <p>Un <b>noyau</b> central, chargé positivement, formé de <b style="color:#C00000">protons</b> (charge +e) et de <b style="color:#555">neutrons</b> (charge nulle), entouré d'un <b style="color:#2E75B6">nuage électronique</b> (électrons, charge −e).</p>
+    </div>
+    <div class="def-card">
+      <h4>📌 Particules α (alpha)</h4>
+      <p>Particules émises par certaines substances radioactives. Elles sont <b>chargées positivement</b> et très rapides. Deux charges de même signe se <b>repoussent</b>.</p>
+    </div>
+    <div class="def-card">
+      <h4>📌 Ordres de grandeur</h4>
+      <div class="formula">Atome : ~10⁻¹⁰ m &nbsp;·&nbsp; Noyau : ~10⁻¹⁵ m</div>
+      <p style="margin-top:6px">L'atome est essentiellement constitué de <b>vide</b>.</p>
+    </div>
+  </div>
+</div>
+
+<div class="tabs-wrapper">
+  <div class="tabs">
+    <button class="tab-btn active" onclick="showTab(0)">1 - Frise historique</button>
+    <button class="tab-btn" onclick="showTab(1)">2 - L'expérience de Rutherford</button>
+    <button class="tab-btn" onclick="showTab(2)">3 - Bilan</button>
+  </div>
+
+  <!-- ══ ONGLET 1 - FRISE ══ -->
+  <div class="tab-content active" id="tab-0">
+    <div class="situation-header"><div class="situation-num">1</div><div>
+      <h2>De Démocrite à Chadwick : 2 300 ans d'histoire</h2>
+      <p>Clique sur chaque étape de la frise pour lire le document et observer le modèle proposé.</p>
+    </div></div>
+
+    <div class="frise" id="frise"></div>
+
+    <div class="doc-zone">
+      <div id="docs"></div>
+      <div class="model-box">
+        <canvas id="cModel" width="300" height="260"></canvas>
+        <div class="legend">
+          <span><i style="background:#C00000"></i>charge + / proton</span>
+          <span><i style="background:#888"></i>neutron</span>
+          <span><i style="background:#2E75B6"></i>électron</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="questions"><div class="q-title">📋 Questions</div>
+      <div class="question">
+        <p><span class="code code-app">APP</span><b>Q1.</b> Que signifie le mot grec <i>atomos</i> ? Quelle propriété Démocrite attribuait-il ainsi aux atomes ?</p>
+        <textarea placeholder="Réponse…"></textarea>
+      </div>
+      <div class="question">
+        <p><span class="code code-ana">ANA</span><b>Q2.</b> Quelle découverte de Thomson montre que l'atome n'est <b>pas</b> insécable, contrairement à ce que pensaient Démocrite et Dalton ? Justifie.</p>
+        <textarea placeholder="Réponse…"></textarea>
+      </div>
+      <div class="question">
+        <p><span class="code code-app">APP</span><b>Q3.</b> Quelle nouveauté le modèle de Rutherford apporte-t-il par rapport à celui de Thomson ?</p>
+        <textarea placeholder="Réponse…"></textarea>
+      </div>
+      <div class="question">
+        <p><span class="code code-ana">ANA</span><b>Q4.</b> Compare la façon dont les électrons se déplacent dans le modèle de Rutherford et dans celui de Schrödinger.</p>
+        <textarea placeholder="Réponse…"></textarea>
+      </div>
+      <div class="question">
+        <p><span class="code code-app">APP</span><b>Q5.</b> Quelle particule Chadwick ajoute-t-il au modèle ? Où se trouve-t-elle et quelle est sa charge ?</p>
+        <textarea placeholder="Réponse…"></textarea>
+      </div>
+    </div>
+    <div class="nav-bottom"><button class="btn-nav" onclick="showTab(1)">Situation suivante →</button></div>
+  </div>
+
+  <!-- ══ ONGLET 2 - RUTHERFORD ══ -->
+  <div class="tab-content" id="tab-1">
+    <div class="situation-header"><div class="situation-num">2</div><div>
+      <h2>L'expérience qui a révélé le noyau</h2>
+      <p>En 1909, Hans Geiger et Ernest Marsden, sous la direction de Rutherford, bombardent une très fine feuille d'or (moins d'un micromètre d'épaisseur) avec des particules α. Un écran placé autour de la feuille permet de repérer où arrivent les particules.</p>
+    </div></div>
+    <div class="canvas-zone">
+      <canvas id="cRuth" width="470" height="300"></canvas>
+      <div class="controls">
+        <div class="ctrl-section">Choisir la simulation</div>
+        <div class="toggle-group">
+          <button class="toggle-btn t-proton active" id="btnThom" onclick="setMode('thomson')">🍮 Prévision du modèle de Thomson</button>
+          <button class="toggle-btn t-electron" id="btnObs" onclick="setMode('obs')">🔬 Observation réelle</button>
+        </div>
+        <div class="ctrl-section" style="margin-top:6px">Commandes</div>
+        <div class="toggle-group">
+          <button class="toggle-btn t-neutron" id="btnRun" onclick="toggleRun()">▶️ Lancer</button>
+          <button class="toggle-btn t-neutron" onclick="resetRuth()">🔄 Remettre à zéro</button>
+        </div>
+        <div class="result-box">
+          <strong>📊 Comptage des particules α</strong>
+          <div class="result-row"><span class="result-label">Envoyées :</span><span class="result-val" id="nTot">0</span></div>
+          <div class="result-row"><span class="result-label">Non déviées :</span><span class="result-val" id="nStr">0</span></div>
+          <div class="result-row"><span class="result-label">Déviées :</span><span class="result-val" id="nDev">0</span></div>
+          <div class="result-row"><span class="result-label">Renvoyées vers l'arrière :</span><span class="result-val" id="nBack">0</span></div>
+        </div>
+        <div class="piege-box"><strong>⚠️ Attention :</strong> la simulation exagère la taille du noyau et la proportion de particules déviées. Dans l'expérience réelle, seule une particule α sur 8 000 environ était fortement déviée.</div>
+      </div>
+    </div>
+    <div class="questions"><div class="q-title">📋 Questions</div>
+      <div class="question">
+        <p><span class="code code-app">APP</span><b>Q6.</b> Lance l'<b>observation réelle</b>. Que deviennent la plupart des particules α ? Qu'en déduis-tu sur la matière qui constitue la feuille d'or ?</p>
+        <textarea placeholder="Réponse…"></textarea>
+      </div>
+      <div class="question">
+        <p><span class="code code-ana">ANA</span><b>Q7.</b> Les particules α sont positives. Explique pourquoi quelques-unes sont fortement déviées, voire renvoyées. Qu'en déduis-tu sur la <b>charge</b> et la <b>taille</b> de la zone qui les repousse ?</p>
+        <textarea placeholder="Réponse…"></textarea>
+      </div>
+      <div class="question">
+        <p><span class="code code-val">VAL</span><b>Q8.</b> Compare les deux simulations. Le modèle de Thomson permet-il d'expliquer les observations ? Justifie.</p>
+        <textarea placeholder="Réponse…"></textarea>
+      </div>
+    </div>
+    <div class="nav-bottom">
+      <button class="btn-nav" onclick="showTab(0)">← Situation précédente</button>
+      <button class="btn-nav" onclick="showTab(2)">Situation suivante →</button>
+    </div>
+  </div>
+
+  <!-- ══ ONGLET 3 - BILAN ══ -->
+  <div class="tab-content" id="tab-2">
+    <div class="situation-header"><div class="situation-num">3</div><div>
+      <h2>Bilan : qui a fait quoi ?</h2>
+      <p>Associe chaque idée au scientifique qui l'a proposée, puis vérifie tes réponses.</p>
+    </div></div>
+    <div class="match" id="match"></div>
+    <div class="nav-bottom" style="justify-content:flex-start;margin-top:8px">
+      <button class="btn-nav" style="background:var(--vert)" onclick="verifier()">✔️ Vérifier mes associations</button>
+      <span id="score" class="feedback" style="align-self:center"></span>
+    </div>
+    <div class="questions"><div class="q-title">📋 Questions</div>
+      <div class="question">
+        <p><span class="code code-app">APP</span><b>Q9.</b> Décris le modèle actuel de l'atome en une ou deux phrases (constituants, place et charge de chacun).</p>
+        <textarea placeholder="Réponse…"></textarea>
+      </div>
+      <div class="question">
+        <p><span class="code code-com">COM</span><b>Q10.</b> En quatre à cinq lignes, explique pourquoi le modèle de l'atome a évolué au cours de l'histoire. Appuie-toi sur au moins un exemple précis tiré des documents.</p>
+        <textarea placeholder="Réponse…" style="min-height:90px"></textarea>
+      </div>
+    </div>
+    <div class="nav-bottom"><button class="btn-nav" onclick="showTab(1)">← Situation précédente</button></div>
+  </div>
+</div>
+
+<script>
+const IMG = {"democrite": "data:image/webp;base64,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", "dalton": "data:image/webp;base64,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", "thomson": "data:image/webp;base64,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", "rutherford": "data:image/webp;base64,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", "schrodinger": "data:image/webp;base64,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", "chadwick": "data:image/webp;base64,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"};
+const MODELS = [
+  {k:'democrite', date:'vers −400', nom:'Démocrite', titre:'Modèle de Démocrite',
+   txt:`Vers 400 avant J.-C., le philosophe grec <b>Démocrite</b> pense que la matière est constituée d'infimes particules qu'il appelle <b>atomes</b>. Certains sont ronds et lisses, d'autres rugueux et crochus ; grâce à leurs formes différentes, ils peuvent s'assembler de multiples façons.<br>Pour lui, les atomes sont éternels, immuables et <b>indivisibles</b>. Le mot grec <i>ἄτομος</i> (<i>atomos</i>) signifie « insécable », c'est-à-dire qu'on ne peut pas couper.<br><i>Remarque : c'est une idée philosophique, qui ne repose sur aucune expérience.</i>`},
+  {k:'dalton', date:'1808', nom:'John Dalton', titre:'Modèle de John Dalton',
+   txt:`Au début du XIX<sup>e</sup> siècle, le chimiste anglais <b>John Dalton</b> reprend l'idée d'atome pour expliquer les réactions chimiques. Il représente les atomes par des <b>sphères pleines et indivisibles</b>, semblables à des boules de billard.<br>Chaque élément chimique correspond à un type d'atome ; les atomes se combinent entre eux pour former de nouvelles substances.`},
+  {k:'thomson', date:'1897 / 1904', nom:'Joseph John Thomson', titre:'Modèle de Joseph John Thomson',
+   txt:`En 1897, le physicien anglais <b>J. J. Thomson</b> découvre l'<b>électron</b>, une particule chargée négativement qu'on peut <b>arracher</b> à la matière.<br>L'atome étant électriquement neutre, Thomson propose en 1904 un modèle dans lequel l'atome est une <b>sphère chargée positivement</b> dans laquelle sont dispersés les électrons, comme les fruits dans un « pudding ».`},
+  {k:'rutherford', date:'1911', nom:'Ernest Rutherford', titre:"Modèle d'Ernest Rutherford",
+   txt:`En 1911, en interprétant l'expérience de la feuille d'or (voir onglet 2), <b>Ernest Rutherford</b> montre que l'atome est constitué essentiellement de <b>vide</b>.<br>L'atome possède un <b>noyau</b> central, très petit, chargé positivement, qui concentre la quasi-totalité de la masse. Les électrons tournent autour du noyau sur des trajectoires bien précises, comme les planètes autour du Soleil : c'est le <b>modèle planétaire</b>.`},
+  {k:'schrodinger', date:'1926', nom:'Erwin Schrödinger', titre:"Modèle d'Erwin Schrödinger",
+   txt:`En 1926, le physicien autrichien <b>Erwin Schrödinger</b> établit une équation qui décrit le comportement des électrons. Les électrons n'ont pas de trajectoire définie : on ne peut connaître que les zones de l'espace où ils ont le plus de chances de se trouver.<br>Ces zones forment autour du noyau le <b>nuage électronique</b>.`},
+  {k:'chadwick', date:'1932', nom:'James Chadwick', titre:'Modèle de James Chadwick',
+   txt:`En 1932, le physicien anglais <b>James Chadwick</b> découvre le <b>neutron</b>, une particule électriquement neutre, de masse voisine de celle du proton.<br>Le noyau n'est donc pas seulement constitué de particules positives, les <b>protons</b> (identifiés par Rutherford en 1919), mais aussi de <b>neutrons</b>. On obtient le modèle de l'atome utilisé aujourd'hui au lycée.`}
+];
+
+// ══ FRISE ══════════════════════════════════════════
+let curModel=0, tModel=0, rafModel=null;
+function buildFrise(){
+  const f=document.getElementById('frise'), d=document.getElementById('docs');
+  MODELS.forEach((m,i)=>{
+    const b=document.createElement('button'); b.className='frise-step'+(i===0?' active':'');
+    b.innerHTML=`<img src="${IMG[m.k]}" alt="${m.nom}"><span class="fdate">${m.date}</span><span class="fname">${m.nom}</span>`;
+    b.onclick=()=>selectModel(i); f.appendChild(b);
+    const c=document.createElement('div'); c.className='doc-card'+(i===0?' active':'');
+    c.innerHTML=`<div class="doc-band">Document ${i+1} - ${m.titre} (${m.date})</div><div class="doc-body"><img src="${IMG[m.k]}" alt="${m.nom}"><p>${m.txt}</p></div>`;
+    d.appendChild(c);
+  });
+}
+function selectModel(i){
+  curModel=i;
+  document.querySelectorAll('.frise-step').forEach((b,j)=>b.classList.toggle('active',j===i));
+  document.querySelectorAll('.doc-card').forEach((c,j)=>c.classList.toggle('active',j===i));
+}
+function dot(ctx,x,y,r,col,label){
+  ctx.beginPath();ctx.arc(x,y,r,0,2*Math.PI);ctx.fillStyle=col;ctx.fill();
+  if(label){ctx.fillStyle='white';ctx.font=`bold ${Math.round(r*1.3)}px Arial`;ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(label,x,y+0.5);}
+}
+const CLOUD=[...Array(260)].map(()=>{const a=Math.random()*2*Math.PI,r=Math.abs((Math.random()+Math.random()+Math.random())/3-0.5)*2*95+12;return {a,r};});
+function drawModel(){
+  const cv=document.getElementById('cModel'), ctx=cv.getContext('2d'), W=cv.width, H=cv.height, cx=W/2, cy=H/2;
+  ctx.clearRect(0,0,W,H); tModel+=0.016;
+  const k=MODELS[curModel].k;
+  ctx.textAlign='center';ctx.fillStyle='#1F4E79';ctx.font='bold 13px Segoe UI, Arial';ctx.fillText(MODELS[curModel].titre,cx,18);
+  if(k==='democrite'){
+    const shapes=[[70,80,'r'],[150,70,'c'],[230,90,'r'],[90,170,'h'],[170,160,'r'],[240,190,'c'],[130,215,'h']];
+    shapes.forEach(([x,y,s],i)=>{
+      const dx=4*Math.sin(tModel*1.3+i), dy=4*Math.cos(tModel+i*2);
+      ctx.save();ctx.translate(x+dx,y+dy);ctx.fillStyle='#A07850';ctx.strokeStyle='#6B4F2E';ctx.lineWidth=2;
+      ctx.beginPath();
+      if(s==='r'){ctx.arc(0,0,22,0,2*Math.PI);}
+      else if(s==='c'){for(let a=0;a<=2*Math.PI+0.01;a+=Math.PI/6){const rr=(Math.round(a/(Math.PI/6))%2)?14:24;ctx.lineTo(rr*Math.cos(a),rr*Math.sin(a));}}
+      else {ctx.moveTo(-20,-10);ctx.lineTo(20,-16);ctx.lineTo(10,0);ctx.lineTo(24,14);ctx.lineTo(-16,16);ctx.lineTo(-8,2);ctx.closePath();}
+      ctx.fill();ctx.stroke();ctx.restore();
+    });
+  } else if(k==='dalton'){
+    const g=ctx.createRadialGradient(cx-30,cy-30,10,cx,cy,90);g.addColorStop(0,'#E8E8E8');g.addColorStop(1,'#6E6E6E');
+    ctx.beginPath();ctx.arc(cx,cy+8,90,0,2*Math.PI);ctx.fillStyle=g;ctx.fill();
+    ctx.fillStyle='#333';ctx.font='12px Arial';ctx.fillText('sphère pleine et indivisible',cx,H-8);
+  } else if(k==='thomson'){
+    ctx.beginPath();ctx.arc(cx,cy+8,95,0,2*Math.PI);ctx.fillStyle='rgba(192,0,0,0.18)';ctx.fill();ctx.strokeStyle='#C00000';ctx.lineWidth=2;ctx.stroke();
+    ctx.fillStyle='#C00000';ctx.font='bold 16px Arial';
+    [[-50,-40],[40,-55],[60,20],[-20,50],[-65,15],[10,-5]].forEach(([x,y])=>ctx.fillText('+',cx+x,cy+8+y));
+    [[-30,-55],[20,-30],[70,-15],[40,50],[-55,40],[-75,-15],[-10,20],[15,75]].forEach(([x,y],i)=>dot(ctx,cx+x+2*Math.sin(tModel*2+i),cy+8+y,8,'#2E75B6','−'));
+  } else if(k==='rutherford'){
+    ctx.strokeStyle='#9DB9D8';ctx.lineWidth=1.2;
+    const orb=[[60,25,0.2,1.6],[95,40,-0.6,1.0],[95,40,0.9,0.8]];
+    orb.forEach(([a,b,rot,sp],i)=>{
+      ctx.save();ctx.translate(cx,cy+8);ctx.rotate(rot);ctx.beginPath();ctx.ellipse(0,0,a,b,0,0,2*Math.PI);ctx.stroke();
+      const th=tModel*sp+i*2;dot(ctx,a*Math.cos(th),b*Math.sin(th),7,'#2E75B6','−');ctx.restore();
+    });
+    dot(ctx,cx,cy+8,9,'#C00000','+');
+    ctx.fillStyle='#333';ctx.font='12px Arial';ctx.fillText('noyau positif minuscule + beaucoup de vide',cx,H-8);
+  } else {
+    // nuage électronique (Schrödinger, Chadwick)
+    CLOUD.forEach((p,i)=>{
+      const a=p.a+0.15*Math.sin(tModel*0.7+i);
+      ctx.fillStyle='rgba(46,117,182,'+(0.55-p.r/260)+')';
+      ctx.beginPath();ctx.arc(cx+p.r*Math.cos(a),cy+8+p.r*Math.sin(a),2,0,2*Math.PI);ctx.fill();
+    });
+    if(k==='schrodinger'){dot(ctx,cx,cy+8,9,'#C00000','+');ctx.fillStyle='#333';ctx.font='12px Arial';ctx.fillText('nuage électronique (pas de trajectoire)',cx,H-8);}
+    else{
+      [[-6,-6,'p'],[6,-6,'n'],[-6,6,'n'],[6,6,'p'],[0,0,'p'],[0,-11,'n'],[0,11,'n']].forEach(([x,y,t])=>dot(ctx,cx+x,cy+8+y,6.5,t==='p'?'#C00000':'#888',t==='p'?'+':''));
+      ctx.fillStyle='#333';ctx.font='12px Arial';ctx.fillText('noyau : protons + neutrons',cx,H-8);
+    }
+  }
+  rafModel=requestAnimationFrame(drawModel);
+}
+
+// ══ RUTHERFORD ═════════════════════════════════════
+let mode='thomson', running=false, parts=[], cnt={tot:0,str:0,dev:0,back:0}, spawnT=0, rafR=null;
+const FOIL_X=300, NUC_DY=26, FOIL_TOP=30, FOIL_BOT=270;
+function setMode(m){
+  mode=m;
+  document.getElementById('btnThom').classList.toggle('active',m==='thomson');
+  document.getElementById('btnObs').classList.toggle('active',m==='obs');
+  resetRuth();
+}
+function toggleRun(){running=!running;document.getElementById('btnRun').textContent=running?'⏸️ Pause':'▶️ Lancer';if(running&&!rafR)loopR();}
+function resetRuth(){parts=[];cnt={tot:0,str:0,dev:0,back:0};updCnt();drawR();}
+function updCnt(){['tot','str','dev','back'].forEach((k,i)=>document.getElementById(['nTot','nStr','nDev','nBack'][i]).textContent=cnt[k]);}
+function spawn(){
+  const y=FOIL_TOP+10+Math.random()*(FOIL_BOT-FOIL_TOP-20);
+  parts.push({x:40,y,vx:3.2,vy:0,hit:false,trail:[]});
+  cnt.tot++;
+}
+function decide(p){
+  const near=Math.round((p.y-FOIL_TOP)/NUC_DY)*NUC_DY+FOIL_TOP, d=p.y-near, ad=Math.abs(d);
+  let ang=0, type='str';
+  if(mode==='thomson'){ang=(Math.random()-0.5)*0.04;}
+  else if(ad<1.0){ang=(d>=0?1:-1)*(2.5+Math.random()*0.5);type='back';}
+  else if(ad<3){ang=(d>=0?1:-1)*(0.35+(3-ad)/3*1.2);type='dev';}
+  else {ang=(Math.random()-0.5)*0.03;}
+  const v=3.2;p.vx=v*Math.cos(ang);p.vy=v*Math.sin(ang);cnt[type]++;updCnt();
+}
+function drawR(){
+  const cv=document.getElementById('cRuth'),ctx=cv.getContext('2d'),W=cv.width,H=cv.height;
+  ctx.clearRect(0,0,W,H);
+  // source
+  ctx.fillStyle='#555';ctx.fillRect(8,H/2-40,26,80);ctx.fillStyle='white';ctx.font='bold 11px Arial';ctx.save();ctx.translate(25,H/2);ctx.rotate(-Math.PI/2);ctx.textAlign='center';ctx.fillText('source α',0,0);ctx.restore();
+  // écran
+  ctx.strokeStyle='#2E9E5B';ctx.lineWidth=3;ctx.beginPath();ctx.arc(FOIL_X,H/2,165,-1.2,1.2);ctx.stroke();
+    // feuille d'or
+  ctx.fillStyle='rgba(212,175,55,0.25)';ctx.fillRect(FOIL_X-8,FOIL_TOP,16,FOIL_BOT-FOIL_TOP);
+  for(let y=FOIL_TOP;y<=FOIL_BOT;y+=NUC_DY){
+    if(mode==='thomson'){ctx.beginPath();ctx.arc(FOIL_X,y,NUC_DY/2,0,2*Math.PI);ctx.fillStyle='rgba(192,0,0,0.15)';ctx.fill();ctx.strokeStyle='rgba(192,0,0,0.35)';ctx.lineWidth=1;ctx.stroke();}
+    else{ctx.beginPath();ctx.arc(FOIL_X,y,NUC_DY/2,0,2*Math.PI);ctx.strokeStyle='rgba(46,117,182,0.25)';ctx.lineWidth=1;ctx.stroke();dot(ctx,FOIL_X,y,2.2,'#C00000');}
+  }
+  ctx.fillStyle='#8B6B00';ctx.font='bold 11px Arial';ctx.textAlign='center';ctx.fillText("feuille d'or",FOIL_X,FOIL_BOT+18);
+  ctx.fillStyle='#2E9E5B';ctx.fillText('écran détecteur',FOIL_X+105,16);
+  // particules
+  parts.forEach(p=>{
+    ctx.strokeStyle='rgba(230,126,34,0.35)';ctx.lineWidth=2;ctx.beginPath();p.trail.forEach((t,i)=>i?ctx.lineTo(t[0],t[1]):ctx.moveTo(t[0],t[1]));ctx.stroke();
+    dot(ctx,p.x,p.y,3.5,'#E67E22');
+  });
+}
+function loopR(){
+  if(!running){rafR=null;return;}
+  spawnT++; if(spawnT%7===0) spawn();
+  parts.forEach(p=>{
+    p.trail.push([p.x,p.y]); if(p.trail.length>40)p.trail.shift();
+    if(!p.hit && p.x>=FOIL_X){p.hit=true;decide(p);}
+    p.x+=p.vx;p.y+=p.vy;
+  });
+  parts=parts.filter(p=>(p.x-FOIL_X)**2+(p.y-150)**2<175**2||p.x<FOIL_X);
+  drawR(); rafR=requestAnimationFrame(loopR);
+}
+
+// ══ BILAN : ASSOCIATIONS ═══════════════════════════
+const MATCH=[
+  ['La matière est faite de particules insécables (idée philosophique, sans expérience).','Démocrite'],
+  ["Les atomes sont des sphères pleines ; chaque élément chimique a son propre type d'atome.",'Dalton'],
+  ["Découverte de l'électron ; atome = sphère positive « truffée » d'électrons.",'Thomson'],
+  ['Atome essentiellement vide, avec un noyau central positif très petit.','Rutherford'],
+  ['Les électrons n’ont pas de trajectoire définie : ils forment un nuage électronique.','Schrödinger'],
+  ['Le noyau contient aussi des particules neutres : les neutrons.','Chadwick']
+];
+const NAMES=['Démocrite','Dalton','Thomson','Rutherford','Schrödinger','Chadwick'];
+function buildMatch(){
+  const z=document.getElementById('match');
+  const order=[3,0,5,2,4,1];
+  order.forEach((i,n)=>{
+    const row=document.createElement('div');row.className='match-row';
+    row.innerHTML=`<span class="match-txt"><b>${String.fromCharCode(65+n)}.</b> ${MATCH[i][0]}</span>
+      <select class="atom-select-custom match-sel" data-ans="${MATCH[i][1]}"><option value="">— Choisir —</option>${NAMES.map(x=>`<option>${x}</option>`).join('')}</select>
+      <span class="feedback"></span>`;
+    z.appendChild(row);
+  });
+}
+function verifier(){
+  let ok=0;
+  document.querySelectorAll('.match-sel').forEach(s=>{
+    const fb=s.nextElementSibling, good=s.value===s.dataset.ans;
+    if(good)ok++;
+    fb.textContent=s.value?(good?'✔':'✘'):'';fb.className='feedback '+(good?'ok':'ko');
+  });
+  const sc=document.getElementById('score');
+  sc.textContent=`${ok} / ${MATCH.length} bonne${ok>1?'s':''} association${ok>1?'s':''}`+(ok===MATCH.length?' 🎉':'');
+  sc.className='feedback '+(ok===MATCH.length?'ok':'ko');
+}
+
+// ══ NAVIGATION ═════════════════════════════════════
+function showTab(idx){
+  document.querySelectorAll('.tab-content').forEach((t,i)=>t.classList.toggle('active',i===idx));
+  document.querySelectorAll('.tab-btn').forEach((b,i)=>b.classList.toggle('active',i===idx));
+  if(idx!==1&&running)toggleRun();
+  if(idx===1)drawR();
+  window.scrollTo({top:document.querySelector('.tabs-wrapper').offsetTop-10,behavior:'smooth'});
+}
+let toolboxOpen=true;
+function toggleToolbox(){
+  toolboxOpen=!toolboxOpen;
+  document.getElementById('toolbox-body').classList.toggle('collapsed',!toolboxOpen);
+  document.getElementById('toolbox-arrow').textContent=toolboxOpen?'▼':'▶';
+}
+
+// ══ SAUVEGARDE ════════════════════════════════════
+const SAVE_KEY='ad_CH3_evolution_modele_v1';
+function sauvegarder(){
+  const data={};
+  document.querySelectorAll('textarea').forEach((el,i)=>data['ta_'+i]=el.value);
+  document.querySelectorAll('.eleve-header input').forEach((el,i)=>data['ev_'+i]=el.value);
+  document.querySelectorAll('.match-sel').forEach((el,i)=>data['ms_'+i]=el.value);
+  try{localStorage.setItem(SAVE_KEY,JSON.stringify(data));}catch(e){alert('Sauvegarde impossible dans ce navigateur.');return;}
+  const s=document.getElementById('save-status');
+  s.textContent='✅ Sauvegardé à '+new Date().toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'});
+  setTimeout(()=>s.textContent='',4000);
+}
+function charger(){
+  let raw=null; try{raw=localStorage.getItem(SAVE_KEY);}catch(e){}
+  if(!raw){alert('Aucune sauvegarde trouvée.');return;}
+  const data=JSON.parse(raw);
+  document.querySelectorAll('textarea').forEach((el,i)=>{if(data['ta_'+i]!==undefined)el.value=data['ta_'+i];});
+  document.querySelectorAll('.eleve-header input').forEach((el,i)=>{if(data['ev_'+i]!==undefined)el.value=data['ev_'+i];});
+  document.querySelectorAll('.match-sel').forEach((el,i)=>{if(data['ms_'+i]!==undefined)el.value=data['ms_'+i];});
+  const s=document.getElementById('save-status');
+  s.textContent='📂 Réponses chargées.';
+  setTimeout(()=>s.textContent='',4000);
+}
+
+// ══ INIT ══════════════════════════════════════════
+window.onload=()=>{buildFrise();buildMatch();drawModel();drawR();};
+</script>
+</body>
+</html>
